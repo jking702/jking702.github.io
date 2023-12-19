@@ -5,6 +5,7 @@ date:	"2023-12-17"
 categories: project
 ---
 
+Changes
 
 I was watching the film [Pi][pi-imdb] the other night, and while it gives an interesting take of what being aggressively obsessed with a problem can do to a person, it felt like it was lacking in any genuine Mathematical substance. This is a bit of a harsh take given that the film was made on a budget of $60,000 and bucked the trend by having a Mathematical protagonist.
 
