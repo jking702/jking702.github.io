@@ -4,12 +4,15 @@ title:  "Imperial College Robotics Society Power Distribution"
 date:   2025-06-28 00:35:45 +0100
 categories: Hardware
 ---
+Founded in 2023, the Imperial College Planetary Robotics Lab (IPRL) is a student run society focused on planetary robotics. Its flagship project is the development of a rover platform for the European Rover Challenge (ERC). While the rover has performed well from a mechanical standpoint, and is the only UK team to have qualified at the time of writing, it became clear that upgrades to the electrical infrastructure were necessary to support any future upgrades to the rover. For example, the use of more powerful motors for the drive, arm, or drill systems could improve mechanical performance, but would also require a more robust power solution capable of reliably delivering the higher currents demanded by such upgrades.
 
-The IPRL power board honours this principle whilst learning from the lessons of its scorched ancestors, many of which bear the blackened and burnt traces that come from minimal overcurrent protection. Yet it remains faithful to the adage: 'If it ain't broke, it doesn't have enough features yet.' With more connectors than any system could ever need, it’s designed so future rover models can build upon it with ease. And with copper traces rated to handle 50 amps before they even get mildly uncomfortable, it can provide more power than any future rover could require. This board is built not just to survive this year, but to power as many rovers as IPRL can churn out, delivering power without question and commanding authority without asking for it.
+The following sections provide an overview of the requirements defined for this system, including certain conservative estimates and intentional overspecifications to ensure robustness, along with the design and testing efforts undertaken to produce a dedicated power distribution solution.
 
-<!-- # Specification
+# Specifications
+- Variable power source
+- 
 
-# Board design
+<!-- # Board design
 
 ## MCU
 
