@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Imperial College Robotics Society Power Distribution"
+title:  "IPRL Power Distribution System"
 date:   2025-06-28 00:35:45 +0100
 categories: Hardware
 ---
@@ -8,10 +8,27 @@ Founded in 2023, the Imperial College Planetary Robotics Lab (IPRL) is a student
 
 The following sections provide an overview of the requirements defined for this system for the 2025 competition, including the specifications with intentional overspecifications to ensure robustness, the two design iterations and the testing efforts undertaken to produce a dedicated power distribution solution.
 
-# Specifications
-- Cheap
-- Able to power the rover for 60 minutes continuous
-- 
+# Requirements
+
+The competition consists of seven tasks, each requiring the rover to operate for 10–30 minutes. To comply with the rules, the rover must be capable of running continuously for at least 60 minutes. This made it crucial to understand the current draw of each subsystem. In earlier iterations, no current draw calculations had been carried out, and the rover instead relied on two 15 Ah lead-acid batteries wired in parallel. While this configuration suggested a combined capacity of 30 Ah, Peukert’s law introduced uncertainty, as the actual usable capacity under the higher current demands of systems such as the robotic arm or drive motors could be significantly lower.
+
+To meet safety standards, the competition requires a hardware emergency stop button, along with indicator lights to display the rover’s current state and fuses to protect components from overcurrent damage.
+
+Although not mandatory, additional systems such as current monitoring and battery monitoring would greatly improve reliability. Current monitoring would provide valuable diagnostic data in the event of a major failure, while battery monitoring would help assess performance and determine whether the chosen batteries are truly fit for purpose.
+
+As always, IPRL is a heavily underfunded project, operating on budgets that are typically only 1–10% of those available to a standard qualifying rover at the ERC. As a result, cost-effectiveness is one of the most critical requirements in the design of our rover.
+
+In summary, the initial power system requirements for the rover were:
+- Ability to power the rover for 60 minutes continuously
+- Battery voltage monitoring
+- Output current monitoring
+- Hardware emergency stop button
+- Indicator lights
+- Fuses for overcurrent protection
+- Cost-effectiveness
+
+# First iteration
+
 
 # Second iteration
 
@@ -19,14 +36,14 @@ The final redesign was motivated by the limited number of ports on the original 
 
 To connect the main and secondary boards and support the 30 A safety margin, a connector was required that was inexpensive, widely available, capable of carrying high currents, and able to transmit analogue signals for the inductive current measurement ICs on each secondary board. The AMASS XT60 2+4 connector, which combines power and signal pins, was initially considered. However, it lacked a reference design, standard PCB footprint, or even a datasheet to create one, making integration difficult. Instead, a more novel solution was adopted by repurposing PCIe lane connectors commonly used in PCs. A PCIe lane in a PC typically assigns 9 pins on the left side of the mechanical key for power and the remaining 155 pins for signals, this design inverted the roles: the signal pins were used to distribute power, while the power pins carried the analogue measurement signals. Although unconventional, this choice offers several advantages. PCIe connectors are extremely low cost at under £1 each, widely available, and standard in industry and so have standard footprints and CAD models, which significantly reduced design uncertainty. Moreover, this configuration is expected to handle up to 70 A, comfortably surpassing the safety margin requirements. It should be noted, however, that the IPC-2221 current handling calculations used to estimate this capability are empirical models that have only been validated up to 35 A, so the 70 A figure is an extrapolation rather than a certified limit. Nevertheless, it remains comfortably above the design target. The primary drawback of using PCIe connectors is the mechanical reliability under vibrations as the typical application does not see a PC moving or being subject to vibrations. To mitigate this, plated mounting holes were added to the secondary boards so they could be securely fastened to the power system enclosure. The complete structure of the main board and secondary boards, including how they interconnect via the PCIe lanes, is shown in Figures 1, 2, and 3.
 
+![Figure 1](/assets/images/board_exploded.png)
 **Figure 1:** Exploded view showing how the secondary boards connect to the main board via PCIe connectors.  
-![Figure 1](Final%20Design/Images/Electronics/board_exploded.png)
 
-**Figure 2:** Layout of the main power distribution board, highlighting the PCIe connectors and copper pours.  
 ![Figure 2](/assets/images/main_board.png)
+**Figure 2:** Layout of the main power distribution board, highlighting the PCIe connectors and copper pours.  
 
+![Figure 3](/assets/images/secondary_board.png)
 **Figure 3:** Standardised secondary power board used to supply individual subsystems.  
-![Figure 3](Final%20Design/Images/Electronics/secondary_board.png)
 
 Once this configuration was established, the physical implementation took advantage of extensive copper pours on both the top and bottom layers of the main power board to reliably carry high currents, as shown in Figure 4. This figure highlights the primary current-carrying path, with a measuring tape indicating the width of its narrowest section, measured at approximately 22.6 mm. According to IPC-2221 calculations, this width would result in only a 20 °C temperature rise when continuously carrying 31 A, comfortably maintaining the 30 A safety margin and eliminating the need for heatsinks. It should be noted that IPC-2221 calculations are based on isolated single traces and do not account for heat conduction into surrounding copper areas. Since this design extensively uses copper planes designed as complete fills without thermal reliefs to maximise heat conduction, the board can likely handle currents greater than 30 A. Although this approach makes soldering more challenging because heat is more readily drawn away from through-holes, it helps spread heat into the surrounding copper, further reducing the need for external heatsinking.
 
