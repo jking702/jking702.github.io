@@ -23,7 +23,7 @@ To connect the main and secondary boards and support the 30 A safety margin, a c
 ![Figure 1](Final%20Design/Images/Electronics/board_exploded.png)
 
 **Figure 2:** Layout of the main power distribution board, highlighting the PCIe connectors and copper pours.  
-![Figure 2](Final%20Design/Images/Electronics/main_board.png)
+![Figure 2](/assets/images/main_board.png)
 
 **Figure 3:** Standardised secondary power board used to supply individual subsystems.  
 ![Figure 3](Final%20Design/Images/Electronics/secondary_board.png)
