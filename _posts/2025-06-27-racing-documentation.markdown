@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "The Worlds Worst Backseat Driver"
-pubished: false
+published: false
 date:   2025-06-27 19:25:50 +0100
 categories: Hardware
 ---

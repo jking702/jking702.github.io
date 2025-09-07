@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Designing some firmware for the power board"
-pubished: false
+published: false
 date:   2025-08-26 18:09:30 +0200
 categories: Hardware
 ---

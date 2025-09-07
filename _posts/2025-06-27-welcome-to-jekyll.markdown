@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Welcome to Jekyll!"
-pubished: false
+published: false
 date:   2025-06-27 19:25:45 +0100
 categories: jekyll update
 ---

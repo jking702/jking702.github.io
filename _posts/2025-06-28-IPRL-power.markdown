@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "IPRL Power Distribution System"
-pubished: true
+published: true
 date:   2025-06-28 00:35:45 +0100
 categories: Hardware
 ---
