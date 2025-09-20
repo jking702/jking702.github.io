@@ -1,29 +1,84 @@
 ---
 layout: post
-title: "Upgrading power distribution"
+title: "Upgrading Power Distribution for the IPRL Rover"
 published: false
 date: 2025-09-09 20:22:30 +0100
 categories: Hardware
 ---
 
-I've made numerous posts on the power distribution system that I made for the Imperial Planetary Robotics Lab rover Bobcat. The end product was a practical amalgam of PCBs that provided a battery output with some of the requisit safety features. The improvements are numerous, none of which were implemented in the start due to time constraints. This is a more indepth look at two of the main improvements that are needed before the next competition. The batteries and the battery management.
+Designing a rover’s power system is a balancing act of performance, safety, and cost.  
+For the Imperial Planetary Robotics Lab (IPRL) rover *Bobcat*, I was responsible for re-thinking the power distribution so the team can safely ship the rover to international competitions without sacrificing runtime or blowing the budget.
 
-# Current batteries
+## Requirements and Constraints
+- **Electrical load:** design target ≈20 A continuous with peaks up to ≈40 A (to be validated in testing).  
+- **Battery restrictions:** airline regulations limit lithium batteries to <100 Wh for easy transport.  
+- **Budget:** student competition levels—parts must be inexpensive and easy to source.  
+- **Legacy system:** a single 15 Ah 4S LiPo pack feeding a custom power-splitter PCB.
 
-So the current battery to use is a 15 Ah 4S LiPo battery, which is far larger than anything you can take on a commerical airflight or get shipped. So we ended up driving the rover to try and avoid these issues. This battery worked as expected and so we need to match the similar Watt hours. We didn't use a battery management system, instead we had an ADC that measured the output voltage and warned us when we dropped below a certain voltage.
+The original 15 Ah pack worked electrically but exceeded airline Wh limits, forcing the team to drive the rover from London to Poland for competition.  
+Shipping or flying with that pack was not feasible.
 
-So we need a similar Wh but smaller batteries. The approach would be to then have several seperate LiPos and then put them in parallel. A big problem if you have even a minute difference between the cell voltages and a low resistance connection between them, then you have 10s of amps going between batteries completely uncontrolled. So we need something to limit the current between batteries or to hotswap out the battery being used so we can change which battery is hooked up at a given time.
+## Exploring Alternatives
+We considered several options:
 
-## OR-ing a battery
+### Parallel Packs
+Two smaller packs in parallel looked attractive on paper but posed serious safety risks.  
+Any voltage difference between packs could cause large equalization currents—potentially tens of amps—leading to overheating or catastrophic failure.
 
-So with regards to the current limiting approach, I saw a guy connect several Lithium cells in parallel placing a resistor between them to limit the current until the cell voltages equalised. Not a good idea, but we can do better. So we want current to flow one way into a circuit but not the other way? Well the ultimate device for that is the diode. Place a battery and connect a diode to the output of each, all going to a shared voltage bus. Now sure some issues do come about from this, imagine if you have a high current and put too much power through the diode? Okay not great. So there are specific ideal diodes that work with this. Behold the LTC4450 power OR circuit:
+### Separate Packs Per Subsystem
+Powering each subsystem from its own pack would isolate the batteries but required major redesigns to add voltage monitoring and protection across multiple rails—too disruptive for the schedule.
 
-![Figure 1](/assets/images/OR ing circuit.png)
+## Final Approach: High-Side Ideal-Diode OR-ing
+The winning solution was an **OR-ing circuit** that lets multiple smaller packs share a common rail while preventing cross-charging.
 
-The only issue with this one is that this well documented circuit does not work well with high current, as in the case of IPRL they probably need something in the order of 30 A continuous and maybe 80 A peak depending on what they get up to. So instead we use a high side OR-ing controller that uses an external FET so we get to choose the rating for the FET and so we can handle anything that can be thrown at it.
+A simple diode OR would waste power through voltage drop and heating, so I implemented an *ideal-diode* configuration.  
+The circuit uses a high-side OR-ing controller driving an external MOSFET, allowing us to select a FET with the right current rating and low Rds(on).
 
-We can go in another direction, such as power muxes, but this has better redundancy with no digital control pins required to maintain the operation.
+![Ideal Diode OR-ing Schematic](/assets/images/OR-ing-circuit.png)
 
-# Reconcieved power board
+Key components:
+- **Controller IC:** TI **LM5050-1** high-side OR-ing controller  
+- **MOSFET:** Vishay **SQJQ100E** (low Rds(on), rated well above 40 A)
 
-Improving on the mistakes of the past, I made the fuck up of not having all the boards made in a single schematic. This gave me major headache when I forgot I didnt have the pins going to the correct outputs. 
+Benefits:
+- Airline-compliant packs can run in parallel without risk of one charging another.  
+- Scales to high currents by selecting an appropriate MOSFET.  
+- Minimal voltage drop and heat compared to passive diodes.
+
+## Implementation
+I designed a compact PCB “OR board” that integrates:
+- The LM5050-1 controller
+- A SQJQ100E MOSFET
+- Wide copper pours and heavy copper layers for low resistance and heat spreading.
+
+The board is a drop-in addition to the existing splitter with minimal wiring changes.
+
+## Testing
+
+Because I am no longer have access to a university lab I need to think of ways of testing this safely and cheaply. The tests I would run include:
+- Continuous load testing at 20 A+ and peak testing up to 40 A
+- Batteries can be swapped in and out with no signifigant issue
+- Batteries that are not equally charged can be used
+
+Firstly I need a load that can handle that much power and is also low enough resistance that it draws that amount of current. Last time I free sampled a £70 1 ohm resistor for this test, but now I think I need a new breed of dummy load. I looked at the arachnid labs Re:load Pro and it is a good breed of open source tooling. However my power consumption is far higher and so demands 500 W of dissipating power.
+
+## Testing and Results *(planned)*
+I’m currently ordering the PCB and components.  
+Upcoming tests will include:
+- Continuous load testing at 20 A+ and peak testing up to 40 A.  
+- Measurement of voltage drop across the MOSFET and controller.  
+- Thermal profiling under sustained load.  
+- Verification that total battery capacity remains below the 100 Wh airline limit.
+
+I’ll update this section with measured data, thermal images, and photos of the assembled board once testing is complete.
+
+## Lessons Learned
+This project demonstrates how careful component selection and a few grams of silicon can replace a costly redesign.  
+Working within regulatory, budget, and performance constraints has required:
+- Evaluating multiple architectures quickly.
+- Modeling current flow and thermal limits.
+- Planning a robust test procedure before hardware arrives.
+
+---
+
+*By integrating high-current ideal-diode OR-ing with the LM5050-1 and SQJQ100E, the IPRL team can safely transport the rover worldwide while maintaining reliable high-power operation.*
